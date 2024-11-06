@@ -24,6 +24,7 @@ contract MedicineSupplyChain {
 
     event BatchManufactured(uint indexed batchId, address indexed manufacturer, uint manufactureDate);
     event BatchTransferred(uint indexed batchId, address indexed from, address indexed to, uint date);
+    event BatchInStock(uint indexed batchId, address indexed pharmacy, uint date);
     event BatchSold(uint indexed batchId, address indexed pharmacy, address indexed consumer, uint date);
 
     modifier access(Role role) {
@@ -72,6 +73,8 @@ contract MedicineSupplyChain {
         require(batch.currentOwner == msg.sender);
         
         batch.status = "In Stock";
+
+        BatchInStock(batchId, batch.currentOwner, now);
     }
 
     function sellBatch(uint256 batchId, address consumer) public access(Role.Pharmacy) {
@@ -82,12 +85,5 @@ contract MedicineSupplyChain {
         batch.status = "Sold";
         
         BatchSold(batchId, msg.sender, consumer, now);
-    }
-
-    function verifyBatch(uint256 batchId) public view returns (string, string, address, uint256) {
-        MedicineBatch storage batch = batches[batchId];
-        require(batch.batchId != 0);
-        
-        return (batch.name, batch.status, batch.currentOwner, batch.expiryDate);
     }
 }
