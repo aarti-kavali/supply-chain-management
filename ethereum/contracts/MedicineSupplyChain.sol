@@ -11,7 +11,6 @@ contract MedicineSupplyChain {
     struct MedicineBatch {
         string name; // Name of Medicine
         uint batchId;
-        uint temperature;
         address manufacturer;
         uint manufactureDate;
         uint expiryDate;
@@ -22,7 +21,6 @@ contract MedicineSupplyChain {
 
     struct Shipment {
         uint batchId;
-        uint temperature;
         uint timestamp;
         address sender;
         address receiver;
@@ -35,7 +33,7 @@ contract MedicineSupplyChain {
     mapping(address => Participant) public participants;
 
     event BatchManufactured(uint indexed batchId, address indexed manufacturer, uint manufactureDate);
-    event BatchShipped(bytes32 shipmentHash, uint batchId, uint temperature);
+    event BatchShipped(bytes32 shipmentHash, uint batchId);
     event BatchTransferred(uint indexed batchId, address indexed sender, address indexed receiver, uint date);
     event BatchStored(bytes32 shipmentHash, uint indexed batchId, uint date);
     event BatchDelivered(bytes32 shipmentHash, uint indexed batchId, uint date);
@@ -60,13 +58,12 @@ contract MedicineSupplyChain {
         participants[participant] = Participant(name, role);
     }
 
-    function manufactureBatch(string name, uint temperature, uint expiryDate) public access(Role.Manufacturer) {
+    function manufactureBatch(string name, uint expiryDate) public access(Role.Manufacturer) {
         count++;
         
         batches[count] = MedicineBatch({
             name: name,
             batchId: count,
-            temperature: temperature,
             manufacturer: msg.sender,
             manufactureDate: now,
             expiryDate: expiryDate,
@@ -82,21 +79,16 @@ contract MedicineSupplyChain {
         MedicineBatch storage batch = batches[batchId];
 
         require(batch.currentOwner == msg.sender);
-        require(participants[msg.sender].role == Role.Manufacturer || participants[msg.sender].role == Role.Warehouse);
-        require(participants[receiver].role == Role.Distributor);
         batch.currentOwner = receiver;
         
         BatchTransferred(batchId, msg.sender, receiver, now);
     }
 
-    function registerShipment(uint batchId, uint temperature, address receiver) public access(Role.Distributor) notExpired(batchId) {
+    function registerShipment(uint batchId, address receiver) public access(Role.Distributor) notExpired(batchId) {
         bytes32 shipmentHash = keccak256(batchId, block.timestamp, uint256(msg.sender));
-
-        require(temperature == batches[batchId].temperature);
         
         shipments[shipmentHash] = Shipment({
             batchId: batchId,
-            temperature: temperature,
             timestamp: block.timestamp,
             sender: msg.sender,
             receiver: receiver
@@ -110,7 +102,7 @@ contract MedicineSupplyChain {
         }
         batches[batchId].tracking.push(shipmentHash);
 
-        BatchShipped(shipmentHash, batchId, temperature);
+        BatchShipped(shipmentHash, batchId);
     }
 
     function storeShipment(bytes32 shipmentHash, uint batchId) public access(Role.Warehouse) notExpired(batchId) {

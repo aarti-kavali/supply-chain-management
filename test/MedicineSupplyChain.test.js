@@ -66,7 +66,7 @@ describe('Supply Chain', () => {
             from: accounts[1],
             gas: '1000000'
         });
-        const receipt = await supplyChain.methods.manufactureBatch('Paracetamol', 4, 30).send({
+        const receipt = await supplyChain.methods.manufactureBatch('Paracetamol', 30).send({
             from: accounts[1],
             gas: '1000000'
         });
@@ -80,7 +80,6 @@ describe('Supply Chain', () => {
         const batch = await supplyChain.methods.batches(1).call();
         assert.equal('Paracetamol', batch.name);
         assert.equal(1, batch.batchId);
-        assert.equal(4, batch.temperature);
         assert.equal(accounts[1], batch.manufacturer);
         assert.equal(30, batch.expiryDate);
         assert.equal(accounts[1], batch.currentOwner);
@@ -96,7 +95,7 @@ describe('Supply Chain', () => {
             from: accounts[2],
             gas: '1000000'
         });
-        await supplyChain.methods.manufactureBatch('Paracetamol', 4, 30).send({
+        await supplyChain.methods.manufactureBatch('Paracetamol', 30).send({
             from:accounts[1],
             gas: '1000000'
         });
@@ -106,13 +105,13 @@ describe('Supply Chain', () => {
         });
 
         const event = receipt.events.BatchTransferred;
-        assert(event);
-        assert.equal(1, event.returnValues.batchId);
-        assert.equal(accounts[1], event.returnValues.sender);
-        assert.equal(accounts[2], event.returnValues.receiver);
+        assert(event, "Event");
+        assert.equal(1, event.returnValues.batchId, "Event id");
+        assert.equal(accounts[1], event.returnValues.sender, "Event sender");
+        assert.equal(accounts[2], event.returnValues.receiver, "Event receiver");
 
         const batch = await supplyChain.methods.batches(1).call();
-        assert.equal(accounts[2], batch.currentOwner);
+        assert.equal(accounts[2], batch.currentOwner, "Owner");
     });
 
     // it('register shipment', async () => {

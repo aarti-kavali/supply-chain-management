@@ -1,6 +1,6 @@
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const { Web3 } = require('web3');
-const compiledFactory = require('./build/CampaignFactory.json')
+const compiledSupplyChain = require('./build/MedicineSupplyChain.json')
 
 const provider = new HDWalletProvider(
     'mechanic slide lock food become cargo catch orchard obscure canvas peasant scare',
@@ -14,11 +14,13 @@ const deploy = async () => {
 
     console.log('Attempting to deploy from account', accounts[0]);
 
-    const result = await new web3.eth.Contract(JSON.parse(compiledFactory.interface))
-        .deploy({ data: compiledFactory.bytecode })
+    const result = await new web3.eth.Contract(JSON.parse(compiledSupplyChain.interface))
+        .deploy({ data: compiledSupplyChain.bytecode })
         .send({ gas: 1000000, from: accounts[0] });
 
     console.log('Contract deployed to', result.options.address);
 };
 
 deploy();
+
+// 0x3016517b9890786443420656A2506EfE038cd3ea
