@@ -1,6 +1,6 @@
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const { Web3 } = require('web3');
-const compiledFactory = require('./build/MedicineSupplyChain.json')
+const compiledSupplyChain = require('./build/MedicineSupplyChain.json')
 
 const provider = new HDWalletProvider(
     'mechanic slide lock food become cargo catch orchard obscure canvas peasant scare',
@@ -13,7 +13,7 @@ const address = '';
 const destroy = async () => {
     const accounts = await web3.eth.getAccounts();
 
-    const contract = await new web3.eth.Contract(JSON.parse(compiledFactory.interface), address);
+    const contract = await new web3.eth.Contract(JSON.parse(compiledSupplyChain.interface), address);
     
     console.log('Attempting to self-destruct contract at', address);
 
