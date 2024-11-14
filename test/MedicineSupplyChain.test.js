@@ -57,8 +57,8 @@ describe('Supply Chain', () => {
             gas: '1000000'
         });
         participant = await supplyChain.methods.participants(accounts[4]).call();
-        assert.equal('Pharmacy', participant.name, "Name");
-        assert.equal(3, participant.role, "Role");
+        assert.equal('Pharmacy', participant.name, 'Name');
+        assert.equal(3, participant.role, 'Role');
     });
 
     it('manufacture a batch', async() => {
@@ -105,213 +105,206 @@ describe('Supply Chain', () => {
         });
 
         const event = receipt.events.BatchTransferred;
-        assert(event, "Event");
-        assert.equal(1, event.returnValues.batchId, "Event id");
-        assert.equal(accounts[1], event.returnValues.sender, "Event sender");
-        assert.equal(accounts[2], event.returnValues.receiver, "Event receiver");
+        assert(event);
+        assert.equal(1, event.returnValues.batchId);
+        assert.equal(accounts[1], event.returnValues.sender);
+        assert.equal(accounts[2], event.returnValues.receiver);
 
         const batch = await supplyChain.methods.batches(1).call();
-        assert.equal(accounts[2], batch.currentOwner, "Owner");
+        assert.equal(accounts[2], batch.currentOwner);
     });
 
-    // it('register shipment', async () => {
-    //     await supplyChain.methods.registerParticipant(accounts[1], 'XYZ Lab', 0).send({
-    //         from: accounts[1],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.registerParticipant(accounts[2], 'ABC Logistics', 1).send({
-    //         from: accounts[2],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.registerParticipant(accounts[3], 'Warehouse', 2).send({
-    //         from: accounts[3],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.manufactureBatch('Paracetamol', 4, 30).send({
-    //         from:accounts[1],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.transferBatch(1, accounts[2]).send({
-    //         from: accounts[1],
-    //         gas: '1000000'
-    //     });
-    //     const receipt = await supplyChain.methods.registerShipment(1, 4, accounts[3]).send({
-    //         from: accounts[2],
-    //         gas: '1000000'
-    //     });
+    it('register shipment', async () => {
+        await supplyChain.methods.registerParticipant(accounts[1], 'XYZ Lab', 0).send({
+            from: accounts[1],
+            gas: '1000000'
+        });
+        await supplyChain.methods.registerParticipant(accounts[2], 'ABC Logistics', 1).send({
+            from: accounts[2],
+            gas: '1000000'
+        });
+        await supplyChain.methods.registerParticipant(accounts[3], 'Warehouse', 2).send({
+            from: accounts[3],
+            gas: '1000000'
+        });
+        await supplyChain.methods.manufactureBatch('Paracetamol', 4, 30).send({
+            from:accounts[1],
+            gas: '1000000'
+        });
+        await supplyChain.methods.transferBatch(1, accounts[2]).send({
+            from: accounts[1],
+            gas: '1000000'
+        });
+        const receipt = await supplyChain.methods.registerShipment(1, accounts[3]).send({
+            from: accounts[2],
+            gas: '1000000'
+        });
 
-    //     const batch = await supplyChain.methods.batches(1).call();
-    //     const hash = batch.tracking[0];
-    //     const shipment = await supplyChain.methods.shipments(hash).call();
+        const event = receipt.events.BatchShipped;
+        assert(event);
+        assert.equal(1, event.returnValues.shipmentId);
+        assert.equal(1, event.returnValues.batchId);
 
-    //     const event = receipt.events.BatchShipped;
-    //     assert(event);
-    //     assert.equal(hash, event.returnValues.shipmentHash);
-    //     assert.equal(1, event.returnValues.batchId);
-    //     assert.equal(4, event.returnValues.temperature);
+        const shipment = await supplyChain.methods.shipments(1).call();
+        assert.equal(1, shipment.shipmentId);
+        assert.equal(1, shipment.batchId);
+        assert.equal(accounts[2], shipment.sender);
+        assert.equal(accounts[3], shipment.receiver);
 
-    //     assert.equal(1, shipment.batchId);
-    //     assert.equal(4, shipment.temperature);
-    //     assert.equal(accounts[3], receiver);
+        const batch = await supplyChain.methods.batches(1).call();
+        assert.equal('Shipped', batch.status);
+    });
 
-    //     assert.equal("Shipped", batch.status);
-    // });
+    it('storing the batch', async () => {
+        await supplyChain.methods.registerParticipant(accounts[1], 'XYZ Lab', 0).send({
+            from: accounts[1],
+            gas: '1000000'
+        });
+        await supplyChain.methods.registerParticipant(accounts[2], 'ABC Logistics', 1).send({
+            from: accounts[2],
+            gas: '1000000'
+        });
+        await supplyChain.methods.registerParticipant(accounts[3], 'Warehouse1', 2).send({
+            from: accounts[3],
+            gas: '1000000'
+        });
+        await supplyChain.methods.manufactureBatch('Paracetamol', 4, 30).send({
+            from:accounts[1],
+            gas: '1000000'
+        });
+        await supplyChain.methods.transferBatch(1, accounts[2]).send({
+            from: accounts[1],
+            gas: '1000000'
+        });
+        await supplyChain.methods.registerShipment(1, accounts[3]).send({
+            from: accounts[2],
+            gas: '1000000'
+        });
+        const receipt = await supplyChain.methods.storeShipment(1, 1).send({
+            from: accounts[3],
+            gas: '1000000'
+        });
 
-    // it('storing the batch', async () => {
-    //     await supplyChain.methods.registerParticipant(accounts[1], 'XYZ Lab', 0).send({
-    //         from: accounts[1],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.registerParticipant(accounts[2], 'ABC Logistics', 1).send({
-    //         from: accounts[2],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.registerParticipant(accounts[3], 'Warehouse1', 2).send({
-    //         from: accounts[3],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.manufactureBatch('Paracetamol', 4, 30).send({
-    //         from:accounts[1],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.transferBatch(1, accounts[2]).send({
-    //         from: accounts[1],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.registerShipment(1, 4, accounts[3]).send({
-    //         from: accounts[2],
-    //         gas: '1000000'
-    //     });
-    //     const batch = await supplyChain.methods.batches(1).call();
-    //     const hash = batch.tracking[0];
-    //     const receipt = await supplyChain.methods.storeShipment(hash, 1).send({
-    //         from: accounts[3],
-    //         gas: '1000000'
-    //     });
+        const event = receipt.events.BatchStored;
+        assert(event);
+        assert.equal(1, event.returnValues.shipmentId);
+        assert.equal(1, event.returnValues.batchId);
 
-    //     const event = receipt.events.BatchStored;
-    //     assert(event);
-    //     assert.equal(hash, event.returnValues.shipmentHash);
-    //     assert.equal(1, event.returnValues.batchId);
+        const batch = await supplyChain.methods.batches(1).call();
+        assert.equal('In Storage', batch.status);
+        assert.equal(accounts[3], batch.currentOwner);
+    });
 
-    //     assert.equal("In Storage", batch.status);
-    //     assert.equal(accounts[3], batch.currentOwner);
-    // });
+    it('dispatch the batch', async () => {
+        await supplyChain.methods.registerParticipant(accounts[1], 'XYZ Lab', 0).send({
+            from: accounts[1],
+            gas: '1000000'
+        });
+        await supplyChain.methods.registerParticipant(accounts[2], 'ABC Logistics', 1).send({
+            from: accounts[2],
+            gas: '1000000'
+        });
+        await supplyChain.methods.registerParticipant(accounts[3], 'Warehouse1', 2).send({
+            from: accounts[3],
+            gas: '1000000'
+        });
+        await supplyChain.methods.registerParticipant(accounts[4], 'PQR Pharmacy', 3).send({
+            from: accounts[4],
+            gas: '1000000'
+        });
+        await supplyChain.methods.manufactureBatch('Paracetamol', 4, 30).send({
+            from:accounts[1],
+            gas: '1000000'
+        });
+        await supplyChain.methods.transferBatch(1, accounts[2]).send({
+            from: accounts[1],
+            gas: '1000000'
+        });
+        await supplyChain.methods.registerShipment(1, accounts[3]).send({
+            from: accounts[2],
+            gas: '1000000'
+        });
+        await supplyChain.methods.storeShipment(1, 1).send({
+            from: accounts[3],
+            gas: '1000000'
+        });
+        await supplyChain.methods.transferBatch(1, accounts[2]).send({
+            from: accounts[3],
+            gas: '1000000'
+        });
+        const receipt = await supplyChain.methods.registerShipment(1, accounts[4]).send({
+            from: accounts[2],
+            gas: '1000000'
+        });
 
-    // it('dispatch the batch', async () => {
-    //     await supplyChain.methods.registerParticipant(accounts[1], 'XYZ Lab', 0).send({
-    //         from: accounts[1],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.registerParticipant(accounts[2], 'ABC Logistics', 1).send({
-    //         from: accounts[2],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.registerParticipant(accounts[3], 'Warehouse1', 2).send({
-    //         from: accounts[3],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.registerParticipant(accounts[4], 'PQR Pharmacy', 3).send({
-    //         from: accounts[4],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.manufactureBatch('Paracetamol', 4, 30).send({
-    //         from:accounts[1],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.transferBatch(1, accounts[2]).send({
-    //         from: accounts[1],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.registerShipment(1, 4, accounts[3]).send({
-    //         from: accounts[2],
-    //         gas: '1000000'
-    //     });
-    //     const batch = await supplyChain.methods.batches(1).call();
-    //     var hash = batch.tracking[0];
-    //     await supplyChain.methods.storeShipment(hash, 1).send({
-    //         from: accounts[3],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.transferBatch(1, accounts[3]).send({
-    //         from: accounts[2],
-    //         gas: '1000000'
-    //     });
-    //     const receipt = await supplyChain.registerShipment(1, 4, accounts[4]).send({
-    //         from: accounts[2],
-    //         gas: '1000000'
-    //     });
+        const event = receipt.events.BatchShipped;
+        assert(event);
+        assert.equal(2, event.returnValues.shipmentId);
+        assert.equal(1, event.returnValues.batchId);
+        
+        const shipment = await supplyChain.methods.shipments(2).call();
+        assert.equal(2, shipment.shipmentId);
+        assert.equal(1, shipment.batchId);
+        assert.equal(accounts[2], shipment.sender);
+        assert.equal(accounts[4], shipment.receiver);
 
-    //     hash = batch.tracking[1];
-    //     const shipment = await supplyChain.methods.shipments(hash).call();
+        const batch = await supplyChain.methods.batches(1).call();
+        assert.equal('Dispatched', batch.status);
+    });
 
-    //     const event = receipt.events.BatchShipped;
-    //     assert(event);
-    //     assert.equal(hash, event.returnValues.shipmentHash);
-    //     assert.equal(1, event.returnValues.batchId);
+    it('deliver the batch', async () => {
+        await supplyChain.methods.registerParticipant(accounts[1], 'XYZ Lab', 0).send({
+            from: accounts[1],
+            gas: '1000000'
+        });
+        await supplyChain.methods.registerParticipant(accounts[2], 'ABC Logistics', 1).send({
+            from: accounts[2],
+            gas: '1000000'
+        });
+        await supplyChain.methods.registerParticipant(accounts[3], 'Warehouse1', 2).send({
+            from: accounts[3],
+            gas: '1000000'
+        });
+        await supplyChain.methods.registerParticipant(accounts[4], 'PQR Pharmacy', 3).send({
+            from: accounts[4],
+            gas: '1000000'
+        });
+        await supplyChain.methods.manufactureBatch('Paracetamol', 4, 30).send({
+            from:accounts[1],
+            gas: '1000000'
+        });
+        await supplyChain.methods.transferBatch(1, accounts[2]).send({
+            from: accounts[1],
+            gas: '1000000'
+        });
+        await supplyChain.methods.registerShipment(1, accounts[3]).send({
+            from: accounts[2],
+            gas: '1000000'
+        });
+        await supplyChain.methods.storeShipment(1, 1).send({
+            from: accounts[3],
+            gas: '1000000'
+        });
+        await supplyChain.methods.transferBatch(1, accounts[2]).send({
+            from: accounts[3],
+            gas: '1000000'
+        });
+        await supplyChain.methods.registerShipment(1, accounts[4]).send({
+            from: accounts[2],
+            gas: '1000000'
+        });
+        const receipt = await supplyChain.methods.deliverShipment(2, 1).send({
+            from: accounts[4],
+            gas: '1000000'
+        });
 
-    //     assert.equal(1, shipment.batchId);
-    //     assert.equal(4, shipment.temperature);
-    //     assert.equal(accounts[3], receiver);        
-
-    //     assert.equal("Dispatched", batch.status);
-    // });
-
-    // it('deliver the batch', async () => {
-    //     await supplyChain.methods.registerParticipant(accounts[1], 'XYZ Lab', 0).send({
-    //         from: accounts[1],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.registerParticipant(accounts[2], 'ABC Logistics', 1).send({
-    //         from: accounts[2],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.registerParticipant(accounts[3], 'Warehouse1', 2).send({
-    //         from: accounts[3],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.registerParticipant(accounts[4], 'PQR Pharmacy', 3).send({
-    //         from: accounts[4],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.manufactureBatch('Paracetamol', 4, 30).send({
-    //         from:accounts[1],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.transferBatch(1, accounts[2]).send({
-    //         from: accounts[1],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.registerShipment(1, 4, accounts[3]).send({
-    //         from: accounts[2],
-    //         gas: '1000000'
-    //     });
-    //     const batch = await supplyChain.methods.batches(1).call();
-    //     var hash = batch.tracking[0];
-    //     await supplyChain.methods.storeShipment(hash, 1).send({
-    //         from: accounts[3],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.methods.transferBatch(1, accounts[3]).send({
-    //         from: accounts[2],
-    //         gas: '1000000'
-    //     });
-    //     await supplyChain.registerShipment(1, 4, accounts[4]).send({
-    //         from: accounts[2],
-    //         gas: '1000000'
-    //     });
-    //     hash = batch.tracking[1];
-    //     const receipt = supplyChain.deliverShipment(hash, 1).send({
-    //         from: accounts[2],
-    //         gas: '1000000'
-    //     });
-
-    //     const event = receipt.events.BatchDelivered;
-    //     assert(event);
-    //     assert.equal(hash, event.returnValues.shipmentHash);
-    //     assert.equal(1, event.returnValues.batchId);
-
-    //     assert.equal("Delivered", batch.status);
-    //     assert.equal(accounts[4], batch.currentOwner);
-    // });
+        const event = receipt.events.BatchDelivered;
+        assert(event);
+        assert.equal(2, event.returnValues.shipmentId);
+        assert.equal(1, event.returnValues.batchId);
+        
+        const batch = await supplyChain.methods.batches(1).call();
+        assert.equal('Delivered', batch.status);
+        assert.equal(accounts[4], batch.currentOwner);
+    });
 });
