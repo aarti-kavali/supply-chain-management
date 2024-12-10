@@ -8,7 +8,7 @@ const provider = new HDWalletProvider(
 );
 
 const web3 = new Web3(provider);
-const address = '';
+const address = '0x379822572274A7A08A38789753ac9e858e50BCdE';
 
 const destroy = async () => {
     const accounts = await web3.eth.getAccounts();
@@ -22,4 +22,4 @@ const destroy = async () => {
     console.log('Contract self-destructed');
 };
 
-destroy();
+destroy();  

@@ -26,9 +26,9 @@ contract MedicineSupplyChain {
         address receiver;
     }
 
-    uint batch_count;
-    uint shipment_count;
-    address admin;
+    uint public batch_count;
+    uint public shipment_count;
+    address public admin;
     mapping(uint => Shipment) public shipments;
     mapping(uint => MedicineBatch) public batches;
     mapping(address => Participant) public participants;
@@ -118,6 +118,14 @@ contract MedicineSupplyChain {
         batches[batchId].currentOwner = msg.sender;
 
         BatchDelivered(shipmentId, batchId, now);
+    }
+
+    function getBatchCount() public view returns(uint) {
+        return batch_count;
+    }
+
+    function getShipmentCount() public view returns(uint) {
+        return shipment_count;
     }
 
     function destroy() public {

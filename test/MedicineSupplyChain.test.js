@@ -23,7 +23,7 @@ beforeEach(async () => {
 });
 
 describe('Supply Chain', () => {
-    it('deploys a supply chain', () => {
+    it('deploys a supply chain', async () => {
         assert.ok(supplyChain.options.address);
     });
 
@@ -307,4 +307,33 @@ describe('Supply Chain', () => {
         assert.equal('Delivered', batch.status);
         assert.equal(accounts[4], batch.currentOwner);
     });
+
+    it('retrieves count', async () => {
+        await supplyChain.methods.registerParticipant(accounts[1], 'XYZ Lab', 0).send({
+            from: accounts[1],
+            gas: '1000000'
+        });
+        await supplyChain.methods.registerParticipant(accounts[2], 'ABC Logistics', 1).send({
+            from: accounts[2],
+            gas: '1000000'
+        });
+        await supplyChain.methods.manufactureBatch('Paracetamol', 4, 30).send({
+            from:accounts[1],
+            gas: '1000000'
+        });
+        await supplyChain.methods.transferBatch(1, accounts[2]).send({
+            from: accounts[1],
+            gas: '1000000'
+        });
+        await supplyChain.methods.registerShipment(1, accounts[3]).send({
+            from: accounts[2],
+            gas: '1000000'
+        });
+
+        const batch = await supplyChain.methods.getBatchCount().call();
+        assert(1, batch);
+
+        const shipment = await supplyChain.methods.getShipmentCount().call();
+        assert(1, shipment);
+    })
 });
