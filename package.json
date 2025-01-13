@@ -1,0 +1,25 @@
+{
+  "name": "supply_chain_management",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha",
+    "dev": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@truffle/hdwallet-provider": "^2.1.15",
+    "ganache": "^7.9.2",
+    "mocha": "^10.8.2",
+    "next": "^12.3.4",
+    "next-routes": "^1.4.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "semantic-ui-css": "^2.5.0",
+    "semantic-ui-react": "^2.1.5",
+    "solc": "^0.4.17",
+    "web3": "^4.14.0"
+  }
+}
