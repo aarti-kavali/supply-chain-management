@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Form, Input, Message } from "semantic-ui-react";
 import Layout from "../../components/Layout.js";
-import { Router } from "../../routes.js";
+import { Link, Router } from "../../routes.js";
 import supplychain from '../../ethereum/supplychain.js'; 
 
 class Register extends Component {
@@ -59,14 +59,14 @@ class Register extends Component {
                                 onChange={event => this.setState({ expirydate: event.target.value })}
                             />
                         </Form.Field>
-                        <Message error header="Manufacture Error"
-                         content={this.state.errormessage} />
-                        <Button 
-                            fluid 
-                            primary={true} 
-                            content="Manufacture Batch"
-                            style = {{ marginTop: '40px' }}
-                        />
+                        <Message error header="Manufacture Error" content={this.state.errormessage} />
+
+                        <Link route={`/participant/${this.props.address}`}>
+                            <a>
+                                <Button primary>Back</Button>
+                            </a>
+                        </Link>
+                        <Button primary>Manufacture Batch</Button>
                     </Form>
                 
             </Layout>

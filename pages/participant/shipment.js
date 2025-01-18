@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Form, Input, Message } from "semantic-ui-react";
 import Layout from "../../components/Layout.js";
-import { Router } from "../../routes.js";
+import { Link, Router } from "../../routes.js";
 import supplychain from '../../ethereum/supplychain.js'; 
 
 class Register extends Component {
@@ -54,12 +54,13 @@ class Register extends Component {
                             />
                         </Form.Field>
                         <Message error header="Shipment Not Registered" content={this.state.errormessage} />
-                        <Button 
-                            fluid 
-                            primary={true} 
-                            content="Register Shipment"
-                            style = {{ marginTop: '40px' }}
-                        />
+
+                        <Link route={`/participant/${this.props.address}`}>
+                            <a>
+                                <Button primary>Back</Button>
+                            </a>
+                        </Link>
+                        <Button primary>Register Shipment</Button>
                     </Form>
                 
             </Layout>
