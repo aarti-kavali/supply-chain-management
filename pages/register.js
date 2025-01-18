@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Container, Form, Input, Message } from "semantic-ui-react";
 import Layout from "../components/Layout.js";
-import { Link } from "../routes.js";
-import web3 from '../ethereum/web3.js';
+import { Router } from "../routes.js";
 import supplychain from '../ethereum/supplychain.js'; 
 
 class Register extends Component {
@@ -18,12 +17,12 @@ class Register extends Component {
         event.preventDefault();
         
         try{
-        const accounts = await web3.eth.getAccounts();
-        await supplychain.methods.registerParticipant(this.state.address, this.state.name, this.state.role)
-        .send({
-            from: accounts[0]
-        })
-    }
+            await supplychain.methods.registerParticipant(this.state.address, this.state.name, this.state.role)
+                .send({
+                    from: this.state.address
+                })
+            Router.pushRoute(`index`);
+        }
         catch (err) {
             this.setState({ errormessage: err.message });
         }
@@ -65,14 +64,12 @@ class Register extends Component {
                         </Form.Field>
                         <Message error header="Participant could not be registered"
                          content={this.state.errormessage} />
-                        <Link route={`index`}>
-                            <Button 
-                                fluid 
-                                primary={true} 
-                                content="Register Participant"
-                                style = {{ marginTop: '40px' }}
-                            />
-                        </Link>
+                        <Button 
+                            fluid 
+                            primary={true} 
+                            content="Register Participant"
+                            style = {{ marginTop: '40px' }}
+                        />
                     </Form>
                     
                 </Container>
