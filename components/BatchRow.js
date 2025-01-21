@@ -60,6 +60,8 @@ class BatchRow extends Component {
                     disabled = true;
                 }
                 break;
+            case 'Delivered':
+                disabled = true;
         }
 
         this.state = {
@@ -126,6 +128,7 @@ class BatchRow extends Component {
         finally {
             this.setState({ loading: false });
             Router.pushRoute(`/participant/${address}`);
+            window.location.reload();
         }
     }
 
