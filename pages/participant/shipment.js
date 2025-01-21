@@ -14,14 +14,15 @@ class Register extends Component {
     state = {
         batchid: '',
         address: '',
-        errormessage: ''
+        errormessage: '',
+        loading: false
     };
     
     
     onSubmit = async (event) => {
         event.preventDefault();
 
-        this.setState({ errormessage: '' });
+        this.setState({ loading: true, errormessage: '' });
         
         try{
             await supplychain.methods.registerShipment(this.state.batchid, this.state.address)
@@ -33,6 +34,8 @@ class Register extends Component {
         catch (err) {
             this.setState({ errormessage: err.message });
         }
+
+        this.setState({ loading : false });
     };
 
     render() {
@@ -60,7 +63,7 @@ class Register extends Component {
                                 <Button primary>Back</Button>
                             </a>
                         </Link>
-                        <Button primary>Register Shipment</Button>
+                        <Button loading={this.state.loading} primary>Register Shipment</Button>
                     </Form>
                 
             </Layout>
@@ -68,4 +71,4 @@ class Register extends Component {
     }
 }
 
-export default Register;
+export default Register;

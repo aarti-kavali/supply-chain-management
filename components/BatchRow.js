@@ -11,12 +11,13 @@ class BatchRow extends Component {
 
         switch(role) {
             case 0:
-                action = 'Ship';
+                action = 'Send';
                 break;
             case 1:
-                action = 'Deliver';
+                action = 'Ship';
                 break;
             case 2:
+                if (batch.status == )
                 action = 'Dispatch';
                 break;
             case 3:

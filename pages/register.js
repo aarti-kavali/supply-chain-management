@@ -10,11 +10,14 @@ class Register extends Component {
         address: '',
         name: '',
         role: '',
-        errormessage: ''
+        errormessage: '',
+        loading: false
     };
     
     onSubmit = async (event) => {
         event.preventDefault();
+
+        this.setState({ loading: true, errormessage: '' });
         
         try{
             await supplychain.methods.registerParticipant(this.state.address, this.state.name, this.state.role)
@@ -26,6 +29,8 @@ class Register extends Component {
         catch (err) {
             this.setState({ errormessage: err.message });
         }
+
+        this.setState({ loading: false });
     };
 
     handleRoleChange = (event) => {
@@ -65,6 +70,7 @@ class Register extends Component {
                         <Message error header="Participant could not be registered"
                          content={this.state.errormessage} />
                         <Button 
+                            loading={this.state.loading}
                             fluid 
                             primary={true} 
                             content="Register Participant"

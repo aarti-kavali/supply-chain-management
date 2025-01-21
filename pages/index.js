@@ -9,20 +9,20 @@ class SupplyChainIndex extends Component {
 
     state = {
         address: '',
-        errormessage: ''
+        errormessage: '',
+        loading: false
     };
     
     onSubmit = async (event) => {
         event.preventDefault();
-        console.log(this.state.address);
-
-        this.setState({ errormessage: '' })
 
         if (!web3.utils.isAddress(this.state.address)) {
             this.setState({ errormessage: 'Invalid Ethereum address' });
             return;
         }
         else {
+            this.setState({ loading: true, errormessage: '' });
+
             try {
                 const participant = await supplychain.methods.participants(this.state.address).call();
             
@@ -35,6 +35,8 @@ class SupplyChainIndex extends Component {
                 console.error("Error fetching participant data:", error);
                 this.setState({ errormessage: 'An error occurred while fetching participant data.' });
             }
+
+            this.setState({ loading: false });
         }
     };
 
@@ -52,6 +54,7 @@ class SupplyChainIndex extends Component {
                         </Form.Field>
                         <Message error header="Error" content={this.state.errormessage} />
                         <Button 
+                            loading={this.state.loading}
                             fluid 
                             primary={true} 
                             content="Login"

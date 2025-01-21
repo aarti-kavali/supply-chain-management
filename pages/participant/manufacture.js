@@ -4,7 +4,7 @@ import Layout from "../../components/Layout.js";
 import { Link, Router } from "../../routes.js";
 import supplychain from '../../ethereum/supplychain.js'; 
 
-class Register extends Component {
+class Manufacturer extends Component {
     static async getInitialProps(props) {
         const address = props.query.address;
 
@@ -14,14 +14,18 @@ class Register extends Component {
     state = {
         name: '',
         expirydate: '',
-        errormessage: ''
+        errormessage: '',
+        loading: false
     };
     
     
     onSubmit = async (event) => {
         event.preventDefault();
 
-        this.setState({ errormessage: ''});
+        this.setState({ loading: true, errormessage: ''});
+
+        const expiryDate = new Date(this.state.expirydate);
+        const expiryTimestamp = expiryDate.getTime();
 
         if (isNaN(expiryTimestamp)) {
             this.setState({ errormessage: 'Invalid expiry date. Please provide a valid date.' });
@@ -33,12 +37,14 @@ class Register extends Component {
                 .send({
                     from: this.props.address
                 });
-            Router.pushRoute(`/participant/${this.props.address}/home`);
+            Router.pushRoute(`/participant/${this.props.address}`);
         }
         catch (err) {
             const errorMessage = err.message || 'An unexpected error occurred.';
             this.setState({ errormessage: errorMessage });
         }
+
+        this.setState({ loading: false });
     };
 
     render() {
@@ -55,6 +61,7 @@ class Register extends Component {
                         </Form.Field>
                             <label>Expiry Date</label>
                             <Input 
+                                placeholder="YYYY-MM-DD"
                                 value={this.state.expirydate}
                                 onChange={event => this.setState({ expirydate: event.target.value })}
                             />
@@ -66,7 +73,7 @@ class Register extends Component {
                                 <Button primary>Back</Button>
                             </a>
                         </Link>
-                        <Button primary>Manufacture Batch</Button>
+                        <Button loading={this.state.loading} primary>Manufacture Batch</Button>
                     </Form>
                 
             </Layout>
@@ -74,4 +81,4 @@ class Register extends Component {
     }
 }
 
-export default Register;
+export default Manufacturer;

@@ -35,14 +35,6 @@ class ParticipantHome extends Component {
         })
     }
 
-    // render() {
-    //     return (
-    //         <Layout>
-    //             <Batches/>
-    //         </Layout>
-    //     );
-    // }
-
     render() {
         const { Header, Row, HeaderCell, Body } = Table;
 
