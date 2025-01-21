@@ -29,7 +29,7 @@ class Transfer extends Component {
                 .send({
                     from: this.props.address
                 });
-            Router.pushRoute(`/participant/${this.props.address}/home`);
+            Router.pushRoute(`/participant/${this.props.address}`);
         }
         catch (err) {
             this.setState({ errormessage: err.message });
