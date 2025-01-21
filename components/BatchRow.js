@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Button, Table } from 'semantic-ui-react';
+import { Button, Form, Input, Modal, Table } from 'semantic-ui-react';
 import { Router } from '../routes.js';
-// import supplychain from '../ethereum/supplychain.js';
+import supplychain from '../ethereum/supplychain.js';
 
 class BatchRow extends Component {
     constructor(props) {
@@ -67,30 +67,22 @@ class BatchRow extends Component {
             action,
             route,
             loading: false,
-            errorMessage: ''
+            errorMessage: '',
+            showModal: false,
+            shipmentId: 0
         }
     }
 
-    proceed = async (event) => {
+    proceed = (event) => {
         event.preventDefault();
 
         this.setState({ loading: false, errorMessage: '' });
 
         try {
-            switch(this.state.action) {
-                case 'Send':
-                    Router.pushRoute(this.state.route);
-                    break;
-                case 'Ship':
-                    Router.pushRoute(this.state.route);
-                    break;
-                case 'Dispatch':
-                    Router.pushRoute(this.state.route);
-                    break;
-                case 'Store':
-                    break;
-                case 'Receive':
-                    break;
+            if (this.state.action === 'Store' || this.state.action === 'Receive') {
+                this.setState({ showModal: true });
+            } else {
+                Router.pushRoute(this.state.route);
             }
         }
         catch(err) {
@@ -99,6 +91,42 @@ class BatchRow extends Component {
         }
 
         this.setState({ loading: false });
+    }
+
+    handleSubmit = async (event) => {
+        event.preventDefault();
+
+        const { shipmentId, action } = this.state;
+        const { id, address } = this.props;
+
+        if (!shipmentId) {
+            this.setState({ errorMessage: 'Shipment ID is required.' });
+            return;
+        }
+
+        this.setState({ loading: true, errorMessage: '' });
+
+        try {
+            if (action == 'Store') {
+                await supplychain.methods.storeShipment(shipmentId, id+1).send({
+                    from: address
+                });
+            }
+            else {
+                await supplychain.methods.deliverShipment(shipmentId, id+1).send({
+                    from: address
+                });
+            }
+
+            this.setState({ showModal: false, shipmentId: '' });
+        }
+        catch (err) {
+            this.setState({ errorMessage: err.message || 'An error occurred while processing the transaction.' });
+        } 
+        finally {
+            this.setState({ loading: false });
+            Router.pushRoute(`/participant/${address}`);
+        }
     }
 
     render() {
@@ -123,6 +151,42 @@ class BatchRow extends Component {
                         </Button> )
                     }
                 </Cell>
+
+                <Modal
+                    open={this.state.showModal}
+                    onClose={() => this.setState({ showModal: false })}
+                    size="small"
+                >
+                    <Modal.Header>Enter Shipment Id</Modal.Header>
+                    <Modal.Content>
+                        <Form>
+                            <Form.Field>
+                                <label>Shipment Id</label>
+                                <Input
+                                    value={this.state.shipmentId}
+                                    onChange={(e) => {
+                                        this.setState({ shipmentId: e.target.value })
+                                    }}
+                                />
+                            </Form.Field>
+                        </Form>
+                        {this.state.errorMessage && (
+                            <Message error header="Error" content={this.state.errorMessage} />
+                        )}
+                    </Modal.Content>
+                    <Modal.Actions>
+                        <Button
+                            color="red"
+                            onClick={() => this.setState({ showModal: false, errorMessage: '' })}
+                        >
+                            Cancel
+                        </Button>
+
+                        <Button primary loading={this.state.loading} onClick={this.handleSubmit}>
+                            Submit
+                        </Button>
+                    </Modal.Actions>
+                </Modal>
             </Row>
         );
     }

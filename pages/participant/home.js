@@ -3,6 +3,7 @@ import supplychain from '../../ethereum/supplychain.js';
 import Layout from '../../components/Layout.js';
 import { Table, Button } from 'semantic-ui-react';
 import BatchRow from '../../components/BatchRow.js';
+import ShipmentRow from '../../components/ShipmentRow.js';
 import { Link } from '../../routes.js';
 
 class ParticipantHome extends Component {
@@ -13,6 +14,7 @@ class ParticipantHome extends Component {
         const role = parseInt(participant.role);
 
         const batchCount = await supplychain.methods.getBatchCount().call();
+        const shipmentCount = await supplychain.methods.getShipmentCount().call();
 
         const batches = await Promise.all(
             Array(parseInt(batchCount)).fill().map((_, index) => {
@@ -20,10 +22,16 @@ class ParticipantHome extends Component {
             })
         );
 
-        return { address, batchCount, batches, role };
+        const shipments = await Promise.all(
+            Array(parseInt(shipmentCount)).fill().map((_, index) => {
+                return supplychain.methods.shipments(index+1).call();
+            })
+        );
+
+        return { address, batchCount, shipmentCount, batches, shipments, role };
     }
 
-    renderRow() {
+    renderBatchRow() {
         return this.props.batches.map((batch, index) => {
             return <BatchRow 
                 key={index}
@@ -32,7 +40,17 @@ class ParticipantHome extends Component {
                 role={this.props.role}
                 address={this.props.address}
             />
-        })
+        });
+    }
+
+    renderShipmentRow() {
+        return this.props.shipments.map((shipment, index) => {
+            return <ShipmentRow 
+                key={index}
+                id={index}
+                shipment={shipment}
+            />
+        });
     }
 
     render() {
@@ -44,13 +62,10 @@ class ParticipantHome extends Component {
             buttonContent = 'Manufacture Batch'
             route = `/participant/${this.props.address}/manufacture`
         }
-        else if (this.props.role == 1) {
-            buttonContent = 'Register Shipment'
-            route = `/participant/${this.props.address}/shipment`
-        }
 
         return (
             <Layout>
+                <h3>Batch Details</h3>
                 <Table>
                     <Header>
                         <Row>
@@ -64,7 +79,23 @@ class ParticipantHome extends Component {
                     </Header>
 
                     <Body>
-                        {this.renderRow()}
+                        {this.renderBatchRow()}
+                    </Body>
+                </Table>
+
+                <h3>Shipment Details</h3>
+                <Table>
+                    <Header>
+                        <Row>
+                            <HeaderCell>Shipment ID</HeaderCell>
+                            <HeaderCell>Batch ID</HeaderCell>
+                            <HeaderCell>Sender</HeaderCell>
+                            <HeaderCell>Receiver</HeaderCell>
+                        </Row>
+                    </Header>
+
+                    <Body>
+                        {this.renderShipmentRow()}
                     </Body>
                 </Table>
 
