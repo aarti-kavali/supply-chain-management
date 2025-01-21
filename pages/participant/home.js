@@ -54,7 +54,7 @@ class ParticipantHome extends Component {
         }
         else if (this.props.role == 1) {
             buttonContent = 'Register Shipment'
-            route = `/participant/${this.props.address}/manufacture`
+            route = `/participant/${this.props.address}/shipment`
         }
 
         return (

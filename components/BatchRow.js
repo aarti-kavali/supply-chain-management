@@ -46,8 +46,8 @@ class BatchRow extends Component {
                 <Cell>{batch.currentOwner}</Cell>
                 <Cell>{batch.status}</Cell>
                 <Cell>
-                    {this.state.disabled ? (
-                        <Button color='teal' basic onClick={this.proceed}>{this.state.action}</Button> ) : null
+                    {this.state.disabled ? null : (
+                        <Button color='teal' basic onClick={this.proceed}>{this.state.action}</Button> )
                     }
                 </Cell>
             </Row>
